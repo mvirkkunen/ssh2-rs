@@ -866,9 +866,9 @@ impl Session {
         channel_type: &str,
         window_size: u32,
         packet_size: u32,
-        message: Option<&str>,
+        message: Option<&[u8]>,
     ) -> Result<Channel, Error> {
-        let message_len = message.map(|s| s.len()).unwrap_or(0);
+        let message_len = message.map(|m| m.len()).unwrap_or(0);
         let inner = self.inner();
         unsafe {
             let ret = raw::libssh2_channel_open_ex(
@@ -878,8 +878,7 @@ impl Session {
                 window_size as c_uint,
                 packet_size as c_uint,
                 message
-                    .as_ref()
-                    .map(|s| s.as_ptr())
+                    .map(|m| m.as_ptr())
                     .unwrap_or(0 as *const _) as *const _,
                 message_len as c_uint,
             );
